@@ -42,13 +42,23 @@ const store = new Vuex.Store({
 
   },
   actions: {
-    async dbGet({ commit }, data){
+    async dbQuery({ commit }, data){
       try{
-        const response = await axios.get("http://localhost:3000/"+data.endpoint);
+        const response = await axios.post("http://localhost:3000/"+data.endpoint, data.params);
          commit('setNotice', {show: true, color: 'success', message: 'Loaded Data!'});
         return response.data;
       }catch(err){
         commit('setNotice', {show: true, color: 'error', message: 'Failed to Load Data!'});
+        console.log(err);
+      }
+    },
+    async dbUpdate({ commit }, data){
+      try{
+        const response = await axios.put("http://localhost:3000/"+data.endpoint, data.params);
+         commit('setNotice', {show: true, color: 'success', message: 'Saved Data!'});
+        return response.data;
+      }catch(err){
+        commit('setNotice', {show: true, color: 'error', message: 'Failed to Save Data!'});
         console.log(err);
       }
     },

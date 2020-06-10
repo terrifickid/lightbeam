@@ -30,24 +30,21 @@ async function init(){
     var db = dbClient.db('orderwrite-dev');
 
 //ENDPOINTS
-    //Return Collection List
-    app.get('/:collection', async function(req, res) {
-      const col = db.collection(req.params.collection);
-      const docs = await col.find().toArray();
-      res.json(docs);
-    });
-    //Return Collection Record by id
-    app.get('/:collection/:id', async function(req, res) {
-      const id = mongo.ObjectId(req.params.id);
-      const col = db.collection(req.params.collection);
-      const docs = await col.find({'_id': id}).toArray();
-      res.json(docs);
-    });
-    //Find in Collection
+    //Get Collection
     app.post('/:collection', async function(req, res) {
       const col = db.collection(req.params.collection);
-      const docs = await col.find(req.body).toArray();
+      const docs = await col.find(db.params).toArray();
       res.json(docs);
+    });
+
+    //Update Collection
+    app.put('/:collection', async function(req, res) {
+      const id = mongo.ObjectId(req.body._id);
+      delete req.body._id;
+      const col = db.collection(req.params.collection);
+      const write = await col.updateOne({'_id': id}, {$set: req.body}, {upsert: true});
+      console.log(write);
+      res.json('tk');
     });
 
     //Listen
