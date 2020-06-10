@@ -4,7 +4,7 @@
     <v-col cols="12" sm="6">
       <v-form ref="form" class="pa-12" @submit="submit()" onSubmit="return false;">
       <h1 class="mb-6">Welcome to Orderwrite!</h1>
-      <Notice></Notice>
+
 
       <h4 class="mt-6 mb-4">Login</h4>
 
@@ -22,7 +22,7 @@
 </template>
 
 <script>
-import Notice from '../components/Notice.vue';
+
 export default {
   name: 'Home',
   data: () => ({
@@ -51,7 +51,6 @@ export default {
     },
   },
   components: {
-    Notice
   },
   methods:{
     async submit(){

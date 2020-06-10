@@ -2,15 +2,50 @@
 <!-- App.vue -->
 
 <v-app>
+
   <v-navigation-drawer app v-model="drawer">
-     <v-list>
-       <v-list-item>
-          <v-list-item-content>
-             <v-list-item-title>Application</v-list-item-title>
-             <v-list-item-subtitle>Subtext</v-list-item-subtitle>
-           </v-list-item-content>
+
+  <v-list >
+
+   <v-list-item :to="{name: 'Home'}">
+     <v-list-item-title>Home</v-list-item-title>
+   </v-list-item>
+  <v-divider></v-divider>
+
+   <v-list-group>
+     <template v-slot:activator>
+       <v-list-item-title>Reports</v-list-item-title>
+     </template>
+   </v-list-group>
+
+   <v-divider></v-divider>
+    <v-list-group>
+      <template v-slot:activator>
+        <v-list-item-title>Catalog</v-list-item-title>
+      </template>
+    </v-list-group>
+    <v-divider></v-divider>
+     <v-list-group>
+       <template v-slot:activator>
+         <v-list-item-title>People Management</v-list-item-title>
+       </template>
+
+       <v-list-item link :to="{name: 'Users'}">
+         <v-list-item-title>Users</v-list-item-title>
        </v-list-item>
-     </v-list>
+
+
+     </v-list-group>
+     <v-divider></v-divider>
+      <v-list-group>
+        <template v-slot:activator>
+          <v-list-item-title>Order Management</v-list-item-title>
+        </template>
+      </v-list-group>
+      <v-divider></v-divider>
+      <v-list-item :to="{name: 'Login'}" ><v-list-item-title >Logout</v-list-item-title></v-list-item>
+
+ </v-list>
   </v-navigation-drawer>
 
   <v-app-bar app>
@@ -30,7 +65,7 @@
 
     <!-- Provides the application the proper gutter -->
     <v-container fluid>
-
+  <Notice></Notice>
       <!-- If using vue-router -->
       <router-view></router-view>
     </v-container>
@@ -40,10 +75,11 @@
 </template>
 
 <script>
-
+import Notice from './components/Notice.vue';
+import router from './router';
 export default {
   name: 'App',
-  components: { },
+  components: { Notice },
   data: () => ({
     drawer: false
   }),
@@ -57,5 +93,13 @@ export default {
       }
     },
   },
+  methods:{
+    Route(link){
+      router.push(link);
+    }
+  },
+  beforeCreate(){
+
+  }
 };
 </script>

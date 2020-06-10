@@ -7,7 +7,7 @@ import axios from 'axios';
 
 const store = new Vuex.Store({
   state: {
-    notice: null,
+    notice: {show: false, message: null, color: null},
     user: {
       role: null
     },
@@ -29,7 +29,8 @@ const store = new Vuex.Store({
             Object.assign(state, JSON.parse(localStorage.getItem('orderwrite')))
         );
       }
-      state.notice = null;
+      state.notice = {show: false, message: null, color: null};
+
     },
     setNotice(state, notice){
       state.notice = notice;
@@ -41,6 +42,16 @@ const store = new Vuex.Store({
 
   },
   actions: {
+    async dbGet({ commit }, data){
+      try{
+        const response = await axios.get("http://localhost:3000/"+data.endpoint);
+         commit('setNotice', {show: true, color: 'success', message: 'Loaded Data!'});
+        return response.data;
+      }catch(err){
+        commit('setNotice', {show: true, color: 'error', message: 'Failed to Load Data!'});
+        console.log(err);
+      }
+    },
     async login({ commit }, creds){
       try{
         const response = await axios.post("http://localhost:3000/users",creds);
@@ -48,11 +59,12 @@ const store = new Vuex.Store({
         commit('setUser', null);
         if(response.data[0]){
           commit('setUser', response.data[0]);
+          commit('setNotice', {show: true, color: 'success', message: 'Login Successful!'});
           router.push('/').catch(function(){});
           return true;
         }
 
-        commit('setNotice', {error: 'Username or password Incorrect.'});
+        commit('setNotice', {show: true, color: 'error', message: 'Username or password Incorrect.'});
         return false;
       }catch(err){
 
@@ -63,6 +75,9 @@ const store = new Vuex.Store({
   modules: {
   }
 });
+
+  store.commit('initialiseStore');
+
 store.subscribe((mutation, state) => {
  localStorage.setItem('orderwrite', JSON.stringify(state));
 });

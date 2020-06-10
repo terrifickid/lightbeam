@@ -1,6 +1,5 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
-import Home from '../views/Home.vue'
 import store from '../store';
 
 Vue.use(VueRouter)
@@ -22,8 +21,20 @@ Vue.use(VueRouter)
     meta:{
       roles: ['admin']
     },
-    component: Home,
+    component: function () {
+      return import('../views/Home.vue');
+    }
 
+  },
+  {
+    path: '/users',
+    name: 'Users',
+    meta:{
+      roles: ['admin']
+    },
+    component: function () {
+      return import('../views/Users.vue');
+    }
   },
   {
     path: '/about',
@@ -46,13 +57,10 @@ const router = new VueRouter({
 
 
 router.beforeEach((to, from, next) => {
-  store.commit('initialiseStore');
-  store.commit('setNotice',null);
   var user = store.getters.getUser;
   var role = null;
   if(user) role = user.role;
-
-  console.log(user);
+  
   try{
     if(to.meta.roles.includes(role) || to.meta.roles.includes('open')){
       next();
