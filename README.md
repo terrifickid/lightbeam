@@ -5,8 +5,9 @@
 npm install
 ```
 
-### Compiles and hot-reloads for development
+### Runs Server + Compile and hot-reload for development
 ```
+npm run startdb
 npm run serve
 ```
 
