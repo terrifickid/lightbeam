@@ -45,7 +45,7 @@ const store = new Vuex.Store({
     async dbQuery({ commit }, data){
       try{
         const response = await axios.post("http://localhost:3000/"+data.endpoint, data.params);
-         commit('setNotice', {show: true, color: 'success', message: 'Loaded Data!'});
+         //commit('setNotice', {show: true, color: 'success', message: 'Loaded Data!'});
         return response.data;
       }catch(err){
         commit('setNotice', {show: true, color: 'error', message: 'Failed to Load Data!'});
@@ -54,12 +54,23 @@ const store = new Vuex.Store({
     },
     async dbUpdate({ commit }, data){
       try{
-        const response = await axios.put("http://localhost:3000/"+data.endpoint, data.params);
-         commit('setNotice', {show: true, color: 'success', message: 'Saved Data!'});
-        return response.data;
+        const res = await axios.put("http://localhost:3000/"+data.endpoint, data.params);
+        commit('setNotice', {show: true, color: 'success', message: res.data.message});
+        return true;
       }catch(err){
-        commit('setNotice', {show: true, color: 'error', message: 'Failed to Save Data!'});
-        console.log(err);
+        commit('setNotice', {show: true, color: 'error', message: err.response.data.message});
+        console.log('DBERROR', err.response.data.debug);
+      }
+    },
+    async dbDelete({ commit }, data){
+      try{
+        const res = await axios.delete("http://localhost:3000/"+data.endpoint);
+        commit('setNotice', {show: true, color: 'success', message: res.data.message});
+        return true;
+      }catch(err){
+        commit('setNotice', {show: true, color: 'error', message: err.response.data.message});
+        console.log('DBERROR', err.response.data.debug);
+        return false;
       }
     },
     async login({ commit }, creds){

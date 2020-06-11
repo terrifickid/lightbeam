@@ -13,7 +13,28 @@
       single-line
       hide-details
     ></v-text-field>
-    <v-dialog v-model="userDialog" persistent hide-overlay max-width="800">
+
+    </v-card-title>
+    <v-data-table
+      :headers="headers"
+      :items="data"
+      :search="search"
+      :loading="isLoading"
+    >
+    <template v-slot:item.actions="{ item }">
+      <v-icon
+        small
+        class="mr-2"
+        @click="edit(item)"
+      >
+        mdi-pencil
+      </v-icon>
+
+    </template>
+    </v-data-table>
+
+
+    <v-dialog v-model="dialog" persistent hide-overlay max-width="800">
               <template v-slot:activator="{ on, attrs }">
               <v-btn
                 fab
@@ -30,9 +51,9 @@
               </template>
               <v-card>
                 <v-card-title>
-                  <span class="headline">Add New User</span>
+                  <span class="headline">User</span>
                 </v-card-title>
-                <v-divider  class="mb-5"></v-divider>
+                <v-divider  class="mb-6"></v-divider>
                 <v-card-text>
 
                         <v-text-field v-model="user.username" label="Username"></v-text-field>
@@ -50,39 +71,21 @@
                         <v-text-field v-model="user.campaign" label="Campaign"></v-text-field>
 
                         <v-text-field v-model="user.distributor" label="Distributor"></v-text-field>
-
-
-
-
-
                 </v-card-text>
 
-                <v-card-actions>
+                <v-card-actions class="pa-6">
+
+                  <v-btn color="red"   large outlined @click="del">DELETE</v-btn>
                   <v-spacer></v-spacer>
-                  <v-btn color="blue darken-1" text @click="close">Cancel</v-btn>
-                  <v-btn color="blue darken-1" text @click="save">Save</v-btn>
+                  <v-btn color="secondary"  large light  outlined @click="close">Cancel</v-btn>
+                  <v-btn color="red" large dark @click="save" :loading="isSaving">Save</v-btn>
+
                 </v-card-actions>
               </v-card>
             </v-dialog>
-    </v-card-title>
-    <v-data-table
-      :headers="headers"
-      :items="users"
-      :search="search"
-      :loading="isLoading"
-    >
-    <template v-slot:item.actions="{ item }">
-      <v-icon
-        small
-        class="mr-2"
-        @click="editUser(item)"
-      >
-        mdi-pencil
-      </v-icon>
 
-    </template>
-    </v-data-table>
   </v-card>
+
 </template>
 
 
@@ -97,37 +100,48 @@ export default {
     return {
       search: '',
       headers: [],
-      users: [],
+      data: [],
       isLoading: true,
-      userDialog: false,
-      user: {}
+      isSaving: false,
+      isDeleting: false,
+      dialog: false,
+      record: {}
     }
   },
   methods:{
-    editUser(user){
-      this.user = Object.assign({}, user);
-      this.userDialog = true;
+    edit(record){
+      this.record = Object.assign({}, record);
+      this.dialog = true;
     },
     close(){
-    this.userDialog = false;
-        this.$nextTick(() => {
-          this.user = Object.assign({}, {});
-        });
+    this.dialog = false;
+    this.record = Object.assign({}, {});
     },
     async save(){
-      var write = await this.$store.dispatch('dbUpdate', {endpoint: 'users/', params: this.user});
-      this.users = await this.$store.dispatch('dbQuery', {endpoint: 'users/', params: {} });
-      this.userDialog = false;
-      this.$nextTick(() => {
-        this.user = Object.assign({}, {});
-      });
-      console.log(write);
+      this.isSaving = true;
+      var res = await this.$store.dispatch('dbUpdate', {endpoint: 'users/', params: this.record});
+      if(res){
+        this.data = await this.$store.dispatch('dbQuery', {endpoint: 'users/', params: {} });
+        this.dialog = false;
+        this.record = Object.assign({}, {});
+        this.isSaving = false;
+        return;
+      }
+
+      this.isSaving = false;
+      return;
+    },
+    async del(){
+      var res = await this.$store.dispatch('dbDelete', {endpoint: 'users/'+this.user._id });
+      if(res) this.data = await this.$store.dispatch('dbQuery', {endpoint: 'users/', params: {} });
+      this.dialog = false;
+      this.record = Object.assign({}, {});
     }
 
   },
   async mounted(){
-    var users = await this.$store.dispatch('dbQuery', {endpoint: 'users/', params: {}});
-    this.users = users;
+    this.data = await this.$store.dispatch('dbQuery', {endpoint: 'users/', params: {}});
+
     this.headers = [
       {
         text: 'Username',

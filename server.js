@@ -39,12 +39,30 @@ async function init(){
 
     //Update Collection
     app.put('/:collection', async function(req, res) {
-      const id = mongo.ObjectId(req.body._id);
-      delete req.body._id;
-      const col = db.collection(req.params.collection);
-      const write = await col.updateOne({'_id': id}, {$set: req.body}, {upsert: true});
-      console.log(write);
-      res.json('tk');
+      try{
+        const id = mongo.ObjectId(req.body._id);
+        delete req.body._id;
+        const col = db.collection(req.params.collection);
+        const write = await col.updateOne({'_id': id}, {$set: req.body}, {upsert: true});
+        res.json({message: req.params.collection+' Updated!'});
+      }catch(err){
+          res.status(400).json({message: 'Failed to update '+req.params.collection+'!', debug: err.message});
+          console.log(err.message);
+      }
+    });
+
+    //Update Collection
+    app.delete('/:collection/:id', async function(req, res) {
+      try{
+        const id = mongo.ObjectId(req.params.id);
+        const col = db.collection(req.params.collection);
+        const del = await col.deleteOne({'_id': id});
+        res.json({message: req.params.collection+ ' deleted!'});
+      }catch(err){
+          res.status(400).json({message: 'Failed to delete '+req.params.collection+'!', debug: err.message});
+          console.log(err.message);
+      }
+
     });
 
     //Listen
