@@ -32,8 +32,9 @@ async function init(){
 //ENDPOINTS
     //Get Collection
     app.post('/:collection', async function(req, res) {
+      if(req.body._id) req.body._id = mongo.ObjectId(req.body._id);
       const col = db.collection(req.params.collection);
-      const docs = await col.find(db.params).toArray();
+      const docs = await col.find(req.body).toArray();
       res.json(docs);
     });
 

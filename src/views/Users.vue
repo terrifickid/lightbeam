@@ -56,21 +56,21 @@
                 <v-divider  class="mb-6"></v-divider>
                 <v-card-text>
 
-                        <v-text-field v-model="user.username" label="Username"></v-text-field>
+                        <v-text-field v-model="record.username" label="Username"></v-text-field>
 
-                        <v-text-field v-model="user.password" label="Password"></v-text-field>
+                        <v-text-field v-model="record.password" label="Password"></v-text-field>
 
-                        <v-text-field v-model="user.role" label="Role"></v-text-field>
+                        <v-text-field v-model="record.role" label="Role"></v-text-field>
 
-                        <v-text-field  v-model="user.email" type="email" label="Email"></v-text-field>
+                        <v-text-field  v-model="record.email" type="email" label="Email"></v-text-field>
 
-                        <v-text-field v-model="user.firstname" label="First Name"></v-text-field>
+                        <v-text-field v-model="record.firstname" label="First Name"></v-text-field>
 
-                        <v-text-field  v-model="user.lastname" label="Last Name"></v-text-field>
+                        <v-text-field  v-model="record.lastname" label="Last Name"></v-text-field>
 
-                        <v-text-field v-model="user.campaign" label="Campaign"></v-text-field>
+                        <v-text-field v-model="record.campaign" label="Campaign"></v-text-field>
 
-                        <v-text-field v-model="user.distributor" label="Distributor"></v-text-field>
+                        <v-text-field v-model="record.distributor" label="Distributor"></v-text-field>
                 </v-card-text>
 
                 <v-card-actions class="pa-6">
@@ -132,7 +132,7 @@ export default {
       return;
     },
     async del(){
-      var res = await this.$store.dispatch('dbDelete', {endpoint: 'users/'+this.user._id });
+      var res = await this.$store.dispatch('dbDelete', {endpoint: 'users/'+this.record._id });
       if(res) this.data = await this.$store.dispatch('dbQuery', {endpoint: 'users/', params: {} });
       this.dialog = false;
       this.record = Object.assign({}, {});

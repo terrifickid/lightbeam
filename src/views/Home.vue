@@ -29,6 +29,10 @@
       </v-icon>
 
     </template>
+    <template v-slot:item._id="{ item }">
+      <a :href="'/campaign/'+item._id">View</a>
+
+    </template>
     </v-data-table>
 
     <v-dialog v-model="dialog" persistent fullscreen hide-overlay max-width="800">
@@ -50,16 +54,12 @@
 
                     <v-divider  class="mb-6"></v-divider>
 <v-card-text>
-                <v-tabs left center-active show-arrows="true">
+                <v-tabs left center-active :show-arrows="true">
                   <v-tab align="start"> Name &amp; Launch Date</v-tab>
                   <v-tab justify="start" align="start">Client Info</v-tab>
                   <v-tab>Shopper Login</v-tab>
                   <v-tab>Shopper Experience</v-tab>
-                  <v-tab>Checkout Info</v-tab>
-                  <v-tab>Departments</v-tab>
-                  <v-tab>Locations</v-tab>
-                  <v-tab>Managers</v-tab>
-                  <v-tab>Fufillment</v-tab>
+
                   <v-tab>Products</v-tab>
                   <v-tab>Preview</v-tab>
                   <v-tab-item >
@@ -118,8 +118,101 @@
                   </v-card>
                 </v-tab-item>
                 <v-tab-item>
-                  Checkout Info
+
+                  <v-card>
+
+                    <v-data-table
+                      class="mt-6"
+                      :headers="[
+                        {
+                          text: 'Image',
+                          align: 'start',
+                          value: 'image',
+                        },
+                        {
+                          text: 'Name',
+                          align: 'start',
+                          value: 'name',
+                        },
+                        {
+                          text: 'Description',
+                          align: 'start',
+                          value: 'description',
+                        },
+                        {
+                          text: 'Price',
+                          align: 'start',
+                          value: 'price',
+                        },
+                        { text: 'Actions', value: 'actions', sortable: false }]"
+                      :items="record.products"
+                      hide-default-footer
+                    >
+                    <template v-slot:item.actions="{ item }">
+                      <v-icon
+                        small
+                        class="mr-2"
+                        @click="editProduct(item)"
+                      >
+                        mdi-pencil
+                      </v-icon>
+
+                    </template>
+                    </v-data-table>
+
+
+                  </v-card>
+                  <v-dialog v-model="productDialog" persistent hide-overlay max-width="800">
+                            <template v-slot:activator="{ on, attrs }">
+                            <v-btn class="mt-6"  dark color="red" v-on="on" v-bind="attrs">
+                              Add Product<v-icon>mdi-plus</v-icon>
+                            </v-btn>
+                            </template>
+                            <v-card>
+                              <v-card-title>
+                                <span class="headline">Product</span>
+                              </v-card-title>
+                              <v-divider  class="mb-6"></v-divider>
+                              <v-card-text>
+
+                                      <v-text-field v-model="productRecord.name" label="Product Name"></v-text-field>
+
+                                      <v-text-field v-model="productRecord.price" label="Product Price"></v-text-field>
+
+                                      <v-text-field v-model="productRecord.description" label="Product Description"></v-text-field>
+
+
+                              </v-card-text>
+
+                              <v-card-actions class="pa-6">
+
+                                <v-btn color="red"   large outlined @click="delProduct">DELETE</v-btn>
+                                <v-spacer></v-spacer>
+                                <v-btn color="secondary"  large light  outlined @click="closeProduct">Cancel</v-btn>
+                                <v-btn color="red" large dark @click="saveProduct" :loading="isSaving">Save</v-btn>
+
+                              </v-card-actions>
+                            </v-card>
+                          </v-dialog>
                 </v-tab-item>
+                <v-tab-item>
+                  <v-row>
+
+                    <v-col v-for="(product, index) in record.products" :key="index" cols="12" sm="6" md="4">
+                      <v-card>
+                        <v-img src="http://via.placeholder.com/300x300"></v-img>
+                        <v-card-title>{{product.name}}</v-card-title>
+                        <v-card-subtitle>${{product.price}}</v-card-subtitle>
+                        <v-card-text>
+                          {{product.description}}
+                        </v-card-text>
+                      </v-card>
+                    </v-col>
+
+
+                  </v-row>
+                </v-tab-item>
+
               </v-tabs>
 </v-card-text>
 
@@ -128,7 +221,7 @@
 
                   <v-btn color="red"   large outlined @click="del">DELETE</v-btn>
                   <v-spacer></v-spacer>
-                  <v-btn color="secondary"  large light  outlined @click="close">Cancel</v-btn>
+                  <v-btn color="secondary"  large light  outlined @click="close">Close</v-btn>
                   <v-btn color="red" large dark @click="save" :loading="isSaving">Save</v-btn>
 
                 </v-card-actions>
@@ -150,10 +243,14 @@ export default {
       data: [],
       headers: [],
       record: {},
+      productRecord: {},
       search: null,
       dialog: false,
+      productDialog: false,
+      productIndex: null,
       isLoading: true,
       isSaving: false,
+
     }
   },
   components: {
@@ -173,23 +270,60 @@ export default {
       var res = await this.$store.dispatch('dbUpdate', {endpoint: 'campaigns/', params: this.record});
       if(res){
         this.data = await this.$store.dispatch('dbQuery', {endpoint: 'campaigns/', params: {} });
-        this.dialog = false;
-        this.record = Object.assign({}, {});
+
         this.isSaving = false;
         return;
       }
-
       this.isSaving = false;
       return;
     },
+    async del(){
+      var res = await this.$store.dispatch('dbDelete', {endpoint: 'campaigns/'+this.record._id });
+      if(res) this.data = await this.$store.dispatch('dbQuery', {endpoint: 'campaigns/', params: {} });
+      this.dialog = false;
+      this.record = Object.assign({}, {});
+    },
+    editProduct(productRecord){
+      this.productIndex = this.record.products.indexOf(productRecord);
+      this.productRecord = Object.assign({}, productRecord);
+      this.productDialog = true;
+      console.log(this.productIndex);
+    },
+    closeProduct(){
+      this.productIndex = null;
+      this.productDialog = false;
+      this.productRecord = Object.assign({}, {});
+    },
+    saveProduct(){
+      if(!this.record.products)this.record.products = [];
+      if(this.productIndex === null){
+        this.record.products.push(this.productRecord);
+      }else{
+        this.record.products[this.productIndex] = this.productRecord;
+      }
+      this.productIndex = null;
+      this.productRecord = Object.assign({}, {});
+      this.productDialog = false;
+    },
+    delProduct(){
+      this.record.products.splice(this.productIndex, 1);
+      this.productIndex = null;
+      this.productDialog = false;
+      this.productRecord = Object.assign({}, {});
+    }
   },
   async mounted(){
     this.data = await this.$store.dispatch('dbQuery', {endpoint: 'campaigns/', params: {}});
     this.headers = [
+
       {
         text: 'Campaign',
         align: 'start',
         value: 'name',
+      },{
+        text: 'Link',
+        align: 'start',
+        value: '_id',
       },
       { text: 'Actions', value: 'actions', sortable: false },
     ];

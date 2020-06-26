@@ -48,7 +48,8 @@
  </v-list>
   </v-navigation-drawer>
 
-  <v-app-bar app>
+  <v-app-bar v-if="enableUI" app>
+
 
      <v-row  :align="'center'" :justify="'start'">
        <v-col v-show="user"><v-app-bar-nav-icon @click="drawer = !drawer" ></v-app-bar-nav-icon></v-col>
@@ -81,9 +82,15 @@ export default {
   name: 'App',
   components: { Notice },
   data: () => ({
-    drawer: false
+    drawer: false,
+
   }),
   computed:{
+    enableUI(){
+      if(!this.$route.name) return false;
+      if(this.$route.name != 'Campaign') return true;
+      return false;
+    },
     user:{
       get(){
          return this.$store.getters.getUser;
@@ -98,8 +105,8 @@ export default {
       router.push(link);
     }
   },
-  beforeCreate(){
-
+  mounted(){
+   
   }
 };
 </script>
