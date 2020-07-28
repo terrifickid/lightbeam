@@ -3,7 +3,7 @@
   <v-card>
 
   <v-toolbar color="red" short flat dark>
-    <v-toolbar-title>Users</v-toolbar-title>
+    <v-toolbar-title>Orders</v-toolbar-title>
   </v-toolbar>
     <v-card-title>
     <v-text-field
@@ -21,6 +21,9 @@
       :search="search"
       :loading="isLoading"
     >
+    <template v-slot:item.cart="{ item }">
+      {{item.cart | json}}
+    </template>
     <template v-slot:item.actions="{ item }">
       <v-icon
         small
@@ -29,7 +32,6 @@
       >
         mdi-pencil
       </v-icon>
-
     </template>
     </v-data-table>
 
@@ -56,24 +58,8 @@
                 <v-divider  class="mb-6"></v-divider>
                 <v-card-text>
 
-                        <v-text-field v-model="record.username" label="Username"></v-text-field>
+                      blank!
 
-                        <v-text-field :type="'password'" v-model="record.password" label="Password"></v-text-field>
-
-
-                        <v-select :items="roles" item-value="role" v-model="record.role" item-text="role" label="Role" ></v-select>
-
-
-
-                        <v-text-field  v-model="record.email" type="email" label="Email"></v-text-field>
-
-                        <v-text-field v-model="record.firstname" label="First Name"></v-text-field>
-
-                        <v-text-field  v-model="record.lastname" label="Last Name"></v-text-field>
-
-                        <v-text-field v-model="record.campaign" label="Campaign"></v-text-field>
-
-                        <v-text-field v-model="record.distributor" label="Distributor"></v-text-field>
                 </v-card-text>
 
                 <v-card-actions class="pa-6">
@@ -108,8 +94,7 @@ export default {
       isSaving: false,
       isDeleting: false,
       dialog: false,
-      record: {},
-      roles: {}
+      record: {}
     }
   },
   methods:{
@@ -123,9 +108,9 @@ export default {
     },
     async save(){
       this.isSaving = true;
-      var res = await this.$store.dispatch('dbUpdate', {endpoint: 'users/', params: this.record});
+      var res = await this.$store.dispatch('dbUpdate', {endpoint: 'orders/', params: this.record});
       if(res){
-        this.data = await this.$store.dispatch('dbQuery', {endpoint: 'users/', params: {} });
+        this.data = await this.$store.dispatch('dbQuery', {endpoint: 'orders/', params: {} });
         this.dialog = false;
         this.record = Object.assign({}, {});
         this.isSaving = false;
@@ -136,26 +121,24 @@ export default {
       return;
     },
     async del(){
-      var res = await this.$store.dispatch('dbDelete', {endpoint: 'users/'+this.record._id });
-      if(res) this.data = await this.$store.dispatch('dbQuery', {endpoint: 'users/', params: {} });
+      var res = await this.$store.dispatch('dbDelete', {endpoint: 'orders/'+this.record._id });
+      if(res) this.data = await this.$store.dispatch('dbQuery', {endpoint: 'orders/', params: {} });
       this.dialog = false;
       this.record = Object.assign({}, {});
     }
 
   },
   async mounted(){
-    this.roles = await this.$store.dispatch('dbQuery', {endpoint: 'roles/', params: {} });
-    this.data = await this.$store.dispatch('dbQuery', {endpoint: 'users/', params: {}});
-
+    this.data = await this.$store.dispatch('dbQuery', {endpoint: 'orders/', params: {}});
+    console.log(this.data);
     this.headers = [
       {
-        text: 'Username',
+        text: 'ID',
         align: 'start',
-        value: 'username',
+        value: '_id',
       },
-      { text: 'Distributor', value: 'distributor' },
-      { text: 'Campaign', value: 'campaign' },
-      { text: 'Role', value: 'role' },
+      { text: 'Cart', value: 'cart' },
+
       { text: 'Actions', value: 'actions', sortable: false },
     ];
     this.isLoading = false;

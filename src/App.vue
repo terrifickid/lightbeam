@@ -23,6 +23,9 @@
       <template v-slot:activator>
         <v-list-item-title>Catalog</v-list-item-title>
       </template>
+      <v-list-item link :to="{name: 'Types'}">
+        <v-list-item-title>Types</v-list-item-title>
+      </v-list-item>
     </v-list-group>
     <v-divider></v-divider>
      <v-list-group>
@@ -34,6 +37,10 @@
          <v-list-item-title>Users</v-list-item-title>
        </v-list-item>
 
+       <v-list-item link :to="{name: 'Roles'}">
+         <v-list-item-title>Roles</v-list-item-title>
+       </v-list-item>
+
 
      </v-list-group>
      <v-divider></v-divider>
@@ -41,6 +48,9 @@
         <template v-slot:activator>
           <v-list-item-title>Order Management</v-list-item-title>
         </template>
+        <v-list-item link :to="{name: 'Orders'}">
+          <v-list-item-title>Orders</v-list-item-title>
+        </v-list-item>
       </v-list-group>
       <v-divider></v-divider>
       <v-list-item :to="{name: 'Login'}" ><v-list-item-title >Logout</v-list-item-title></v-list-item>
@@ -106,7 +116,7 @@ export default {
     }
   },
   mounted(){
-   
+
   }
 };
 </script>

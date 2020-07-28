@@ -60,6 +60,7 @@ const store = new Vuex.Store({
       }catch(err){
         commit('setNotice', {show: true, color: 'error', message: err.response.data.message});
         console.log('DBERROR', err.response.data.debug);
+        return false;
       }
     },
     async dbDelete({ commit }, data){

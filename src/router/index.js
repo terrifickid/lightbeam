@@ -37,6 +37,17 @@ Vue.use(VueRouter)
 
   },
   {
+    path: '/orders',
+    name: 'Orders',
+    meta:{
+      roles: ['Administrator']
+    },
+    component: function () {
+      return import('../views/Orders.vue');
+    }
+
+  },
+  {
     path: '/users',
     name: 'Users',
     meta:{
@@ -44,6 +55,26 @@ Vue.use(VueRouter)
     },
     component: function () {
       return import('../views/Users.vue');
+    }
+  },
+  {
+    path: '/roles',
+    name: 'Roles',
+    meta:{
+      roles: ['Administrator']
+    },
+    component: function () {
+      return import('../views/Roles.vue');
+    }
+  },
+  {
+    path: '/types',
+    name: 'Types',
+    meta:{
+      roles: ['Administrator']
+    },
+    component: function () {
+      return import('../views/Types.vue');
     }
   },
 ]

@@ -1,6 +1,10 @@
 <template>
   <div class="campaign">
-    <div class="container">
+    <div v-if="thankYou" class="container text-center">
+      <h1>Thank you!</h1>
+      <h2>Your order has been placed!</h2>
+    </div>
+    <div v-if="!thankYou" class="container">
 
     <h1>{{campaign.name}}</h1>
 
@@ -21,26 +25,35 @@
 
     <div class="row">
       <div class="col-12">
-        <h2>My Order</h2>
-   
+        <h1>Cart</h1>
         <v-simple-table>
-    <template v-slot:default>
-      <thead>
-        <tr>
-          <th class="text-left">Name</th>
-          <th class="text-left">Qty</th>
-          <th class="text-left">Price</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr v-for="item in cart" :key="item.name">
-          <td>{{ item.name }}</td>
-          <td>{{ item.qty }}</td>
-          <td>${{ item.price }}</td>
-        </tr>
-      </tbody>
-    </template>
-  </v-simple-table>
+          <template v-slot:default>
+            <thead>
+              <tr>
+                <th class="text-left">Name</th>
+                <th class="text-left">Qty</th>
+                <th class="text-left">Price</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-for="item in cart" :key="item.name">
+                <td>{{ item.name }}</td>
+                <td>{{ item.qty }}</td>
+                <td>${{ item.price }}</td>
+              </tr>
+            </tbody>
+          </template>
+        </v-simple-table>
+
+
+
+      </div>
+    </div>
+
+
+    <div class="row">
+      <div class="col-12">
+        <v-btn color="red" @click="placeOrder()" :block="true"  dark large>Place Order</v-btn>
       </div>
     </div>
 
@@ -56,7 +69,8 @@ export default {
   name: 'Campaign',
   data: () => ({
     campaign: {},
-    order: []
+    order: [],
+    thankYou: false
   }),
   computed: {
     cart(){
@@ -87,6 +101,11 @@ export default {
   methods:{
     addToCart(product){
       this.order.push(product);
+    },
+    async placeOrder(){
+      var res = await this.$store.dispatch('dbUpdate', {endpoint: 'orders/', params: {cart: this.cart} });
+      if(res)this.thankYou = true;
+
     }
   },
   async mounted(){

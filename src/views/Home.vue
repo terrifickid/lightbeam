@@ -70,13 +70,8 @@
                         <v-text-field v-model="record.distributor" label="Distributor"></v-text-field>
                     </v-card-text>
                   </v-card>
-                  <v-card flat class="mt-6">
-                    <v-card-text>
-                        <v-text-field v-model="record.name" label="Campaign Name"></v-text-field>
-                        <v-text-field v-model="record.companyname" label="Company Name"></v-text-field>
-                        <v-text-field v-model="record.distributor" label="Distributor"></v-text-field>
-                    </v-card-text>
-                  </v-card>
+
+
                 </v-tab-item>
                 <v-tab-item>
                   <v-card flat class="mt-6">
@@ -130,18 +125,18 @@
                           value: 'image',
                         },
                         {
+                          text: 'Type',
+                          align: 'start',
+                          value: 'type',
+                        },
+                        {
                           text: 'Name',
                           align: 'start',
                           value: 'name',
                         },
                         {
-                          text: 'Description',
-                          align: 'start',
-                          value: 'description',
-                        },
-                        {
                           text: 'Price',
-                          align: 'start',
+                          align: 'end',
                           value: 'price',
                         },
                         { text: 'Actions', value: 'actions', sortable: false }]"
@@ -175,11 +170,10 @@
                               <v-divider  class="mb-6"></v-divider>
                               <v-card-text>
 
-                                      <v-text-field v-model="productRecord.name" label="Product Name"></v-text-field>
-
-                                      <v-text-field v-model="productRecord.price" label="Product Price"></v-text-field>
-
-                                      <v-text-field v-model="productRecord.description" label="Product Description"></v-text-field>
+                                <v-select :items="types" item-value="type" v-model="productRecord.type" item-text="type" label="Type" ></v-select>
+                                <v-text-field v-model="productRecord.name" label="Product Name"></v-text-field>
+                                <v-text-field v-model="productRecord.price" label="Product Price"></v-text-field>
+                                <v-text-field v-model="productRecord.description" label="Product Description"></v-text-field>
 
 
                               </v-card-text>
@@ -313,6 +307,7 @@ export default {
     }
   },
   async mounted(){
+    this.types = await this.$store.dispatch('dbQuery', {endpoint: 'types/', params: {} });
     this.data = await this.$store.dispatch('dbQuery', {endpoint: 'campaigns/', params: {}});
     this.headers = [
 
